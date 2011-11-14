@@ -3,420 +3,295 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>MongoDBとHadoopの蜜月関係</title>
-    <script type="text/javascript" src="./js/shCore.js"></script>
-    <script type="text/javascript" src="./js/shBrushJScript.js"></script>
-    <script type="text/javascript" src="./js/shBrushBash.js"></script>
-    <script type="text/javascript" src="./js/shBrushCpp.js"></script>
-    <link href="./css/common.css" type="text/css" rel="stylesheet" media="Screen,projection" />
-    <link href="./css/shCore.css" type="text/css" rel="stylesheet" media="Screen,projection" />
-    <link href="./css/shThemeDefault.css" type="text/css" rel="stylesheet" media="Screen,projection" />
+    <link href="./deck.js/core/deck.core.css" type="text/css" rel="stylesheet" media="Screen,projection" />
+
+
+    <link href="./deck.js/extensions/goto/deck.goto.css" type="text/css" rel="stylesheet" />
+    <link href="./deck.js/extensions/menu/deck.menu.css" type="text/css" rel="stylesheet" />
+    <link href="./deck.js/extensions/navigation/deck.navigation.css" type="text/css" rel="stylesheet" />
+    <link href="./deck.js/extensions/status/deck.status.css" type="text/css" rel="stylesheet" />
+    <link href="./deck.js/extensions/hash/deck.hash.css" type="text/css" rel="stylesheet" />
+
+		<link rel="stylesheet" id="style-theme-link" href="./deck.js/themes/style/swiss.css">
+		<link rel="stylesheet" id="transition-theme-link" href="./deck.js/themes/transition/horizontal-slide.css">
+		
+		<link rel="stylesheet" href="./css/common.css">
+		<link rel="stylesheet" href="./css/main.css">
+
+    <script type="text/javascript" src="./js/modernizr.custom.js"></script>
+		
+    <link href="./shjs/sh_style.css" type="text/css" rel="stylesheet" />
 	</head>
 	<body>
-		<div class="mod-page top"><div>
-				<h1 style="font-size: 30pt; text-align: left;">
-					<pre class="brush: js">> db.presentations.find({twitter: "muddydixon"})
-{
-    "_id" : ObjectId("4e7c86b120247a53b722c0ae")
-  , "title": "MongoDBとHadoopの蜜月関係"
-  , "author": "森藤大地"
-  , "twitter": "@muddydixon"
-}</pre></h1>
-				<h2 style="font-size: 20pt;">
+		<article class="deck-container">
+			<section class="slide" id="title-slide">
+				<h1>
+					MongoDBとHadoopの蜜月関係
+				</h1>
+				<h3>
 					第7回 MongoDB 勉強会 in Tokyo 2011/11/15 at GMO Yours
-				</h2>
+				</h3>
+			</section>
 
-		</div></div>
-
-		<div class="mod-page plain">
-			<div>
+			<section class="slide" id="myself">
 				<h2>自己紹介</h2>
+				<h3>大学/大学院</h3>
 				<ul>
-					<li>大学/大学院：<ul>
-							<li>自然言語処理：形態素列検索・置換システム</li>
-							<li>言語発達の計算機シミュレーション(ElmanNet+SOMみたいな)</li>
-						</ul>
-					</li>
-					<li>就職：
-						<ul>
-							<li>検索エンジン(の広告最適化とか</li>
-							<li>コンテンツマッチエンジンの設計開発とか</li>
-							<li><a href="http://twitter.com/nifty_engineer">エンジニアサポート</a>の中の人とか</li>
-							<li>データマイニング<s>部門</s>個人</li>
-						</ul>
-					</li>
+					<li>自然言語処理：形態素列検索・置換システム</li>
+					<li>言語発達の計算機シミュレーション(ElmanNet+SOMみたいな)</li>
 				</ul>
-			</div>
-		</div>
-		
-		<div class="mod-page shout">
-			<div>
-				<p>ログの解析好きですか？<br>ログの解析していますか？</p>
-			</div>
-		</div>
-		
-		<div class="mod-page shout">
-			<div>
-				<p>解析部門の価値認られていますか？<br>解析部門の人は足りていますか？</p>
-			</div>
-		</div>
-		
-		<div class="mod-page plain">
-			<div>
-				<h2>> db.pages.find({}, {title: 1})</h2>
+				<h3>就職</h3>
 				<ul>
-					<li>ターゲットファイル</li>
-					<li>フロー概略</li>
-					<li>個別概略
-						<ul>
-							<li>State</li>
-							<li>Config</li>
-							<li>JSMapper</li>
-							<li>JSReducer</li>
-						</ul>
-					</li>
+					<li>検索エンジン(の広告最適化とか</li>
+					<li>コンテンツマッチエンジンの設計開発とか</li>
+					<li><a href="http://twitter.com/nifty_engineer">エンジニアサポート</a>の中の人とか</li>
+					<li>データマイニング<s>部門</s>個人</li>
 				</ul>
-			</div>
-		</div>
-
-		<div class="mod-page plain">
-			<div>
-				<h2>> db.pages.find({title: "ターゲットファイル"})</h2>
-				<ul>
-					<li>mongo/db/commands/mr.cpp</li>
-					<li>mongo/db/commands/mr.h</li>
-				</ul>
-			</div>
-		</div>
-
-		<div class="mod-page plain">
-			<div>
-				<h2>> db.pages.find({title: "準備"})</h2>
-				<ul>
-					<li>とりあえずすべてのメソッドに下記コードを注入
-						<pre class="brush: cpp">log() << typeid(this).name() << "::" << __func__ << endl;</pre>
-					</li>
-					<li>これをやっておくと、logから「どのクラスのどのメソッドが呼ばれたか」をトレースできます。(デバッガ苦手です・・・)</li>
-					<li>最初はverbose切っておきます</li>
-				</ul>
-			</div>
-		</div>
-
-		<div class="mod-page plain">
-			<div>
-				<h2>&gt; db.pages.find({title: "フロー概略"}).limit(1)</h2>
-				<pre class="brush: bash">Mon Oct 17 01:55:10 [initandlisten] connection accepted from 127.0.0.1:65122 #1 (1 connection now open)
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr16MapReduceCommandE::run // <= MR起動
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr6ConfigE::Config // <= Configオブジェクト作成
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr10JSFunctionE::JSFunction // <= mapper用関数オブジェクト作成
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr10JSFunctionE::JSFunction // <= reducer用関数オブジェクト作成
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::State // <= Stateオブジェクト作成
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::sourceExists // <= dbのリソース確認
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::init // <= State初期化
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr8JSMapperE::init // <= Mapper初期化
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr10JSFunctionE::init // <= (Mapper)関数初期化
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr9JSReducerE::init // <= Reducer初期化
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr10JSFunctionE::init //<= (Reducer)関数初期化
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::switchMode // <= jsModeのチェック
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::prepTempCollection // <= mr出力用一時コレクション作成
-Mon Oct 17 01:55:10 [conn1] CMD: drop test.tmp.mr.in_0_inc // <= 一時コレクションdrop
-Mon Oct 17 01:55:10 [conn1] build index test.tmp.mr.in_0_inc { 0: 1 } // <= 一時コレクションインデックス貼り
-Mon Oct 17 01:55:10 [conn1] build index done 0 records 0 secs 
-Mon Oct 17 01:55:10 [conn1] CMD: drop test.tmp.mr.in_0
-Mon Oct 17 01:55:10 [conn1] build index test.tmp.mr.in_0 { _id: 1 }
-Mon Oct 17 01:55:10 [conn1] build index done 0 records 0 secs
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::insert // <= system.indexesにnsとかの情報を書き込み(たぶん、このへんで、mrのoutをshardする、みたいのがあると思うけど、未追跡・・・</pre>
-			</div>
-		</div>
-
-
-		<div class="mod-page plain">
-			<div>
-				<h2>&gt; db.pages.find({"cls.mthd": "MapReduceCommand::run"})</h2>
-				<span>1040行目あたり</span>
-				<pre class="brush: cpp">state.init(); // (1)
-state.prepTempCollection(); // (2) </pre>
-				<span>1060行目あたり</span>
-				<pre class="brush: cpp">shared_ptr&lt;Cursor> temp = NamespaceDetailsTransient::getCursor( config.ns.c_str(), config.filter, config.sort ); // (3)
-auto_ptr&lt;ClientCursor> cursor( new ClientCursor( QueryOption_NoCursorTimeout , temp , config.ns.c_str() ) ); // (4)</pre>
-				<span>1070行目あたり</span>
-				<pre class="brush: cpp">while ( cursor->ok() ) { // (5)</pre>
-				<span>1070行目あたり</span>
-				<pre class="brush: cpp">state.reduceInMemory(); // (6)</pre>
+			</section>
+			
+			<section class="slide">
+				<h1>ログの解析好きですか？<br>ログの解析していますか？</h1>
+			</section>
+			
+			<section class="slide">
+				<h1>解析部門の価値認られていますか？<br>解析部門の人は足りていますか？</h1>
+			</section>
+			
+			<section class="slide">
+				<h1>SPOF？<br>Daemon管理？<br>クラスタ管理？</h1>
+			</section>
+			
+			<section class="slide">
+				<h1>勘弁して下さい &gt; &lt; </h1>
+			</section>
+			
+			<section class="slide">
+				<h1>Hadoop?</h1>
+			</section>
+			
+			<section class="slide">
+				<h1>Namenode<br>SecondaryNameNode<br>Datanode<br>TaskTracker<br>JobTracker<br>Daemonのお守り<br>DRBDの構築</h1>
+			</section>
+			
+			<section class="slide">
+				<h1>hive</h1>
+			</section>
+			
+			<section class="slide">
+				<h1>あいつの結果待ってたら<br>2分とかザラに待つんですけど・・・</h1>
+			</section>
+			
+			<section class="slide">
+				<h1>Schema変えるのもねぇ・・・</h1>
+			</section>
+			
+			<section class="slide">
+				<h1>HBase?</h1>
+			</section>
+			
+			<section class="slide">
+				<h1>HBase<br>ZooKeeper</h1>
+			</section>
+			
+			<section class="slide">
+				<h1>これ以上のDaemonのお守りは<br>勘弁して下さい!!</h1>
+			</section>
+			
+			<section class="slide">
+				<h1>そんな解析担当者に贈りたい</h1>
+			</section>
+			
+			<section class="slide">
+				<h1>Mongo-Hadoopな生活</h1>
+			</section>
+			
+			<section class="slide">
+				<h1 style="font-size: 20pt">※ 多分に私見が混ざっています</h1>
+			</section>
+			
+			<section class="slide" id="contents">
+				<h2>Contents</h2>
 				<ol>
-					<li>
-						stateを初期化。内部では設定の各種読み込み(verboseやoutのモード、mapper/reducer/finalizer関数オブジェクト作成、query/sort/limit指定などを行う)
-					</li>
-					<li>
-						mr中にshow collectionsすれば見られるが、mr結果流し込み用の一時collectionを作成する
-					</li>
-					<li>
-						queryを満たす、documentのcursorのためのobjectを生成
-					</li>
-					<li>
-						queryを満たす、documentのcursorを取得
-					</li>
-					<li>
-						お待ちかねのmap処理
-					</li>
-					<li>
-						そしてreduce処理
-					</li>
+					<li>MongoDB</li>
+					<li>Hadoop</li>
+					<li>mongo-hadoop</li>
+					<li>Architecture</li>
+					<li>mapReduce</li>
+					<li>Pros./Cons.</li>
+					<li>Tips</li>
+				</ol>
+			</section>
+			
+			<section class="slide">
+				<h2>MongoDB</h2>
+				<h3>Cons</h3>
+				<ul>
+					<li>OOM in Map/Reduce</li>
+					<li>Rich Resources required (memory / disc)</li>
 				</ul>
-			</div>
-		</div>
+				<h3>Pros</h3>
+				<ul>
+					<li>Schemaless</li>
+					<li>Full Index</li>
+					<li>Replication & High Availability</li>
+					<li>Auto Sharding</li>
+				</ul>
+			</section>
+			
+			<section class="slide">
+				<h2>Hadoop</h2>
+				<h3>Cons</h3>
+				<ul>
+					<li>Difficulty in Operation</li>
+					<li>Many Daemons</li>
+					<li>HBase requires more Daemons</li>
+					<li>hive spends much time</li>
+				</ul>
+				<h3>Pros</h3>
+				<ul>
+					<li>Scaleout</li>
+					<li>Map/Reduce enables us to Calculate Large Data</li>
+					<li>Scalable FileSystem (HDFS) supported</li>
+				</ul>
+			</section>
+			
+			<section class="slide">
+				<h2>We want</h2>
+				<ul>
+					<li>Calculate Large Data Easily (No OOM Killer)</li>
+					<li>No more management Daemons</li>
+					<li>No more non-"Healthy"</li>
+					<li>Find data in a moment on specific query (we use REST API)</li>
+				</ul>
+			</section>
+			
+			<section class="slide">
+				<h2>in MongoDB and Hadoop</h2>
+				<h3>MongoDB</h3>
+				<ul>
+					<li>Difficult Calculating Large Data </li>
+				</ul>
+				<h3>Hadoop</h3>
+				<ul>
+					<li>Too much Daemons</li>
+					<li>Often not "Healthy" warning</li>
+					<li>Cannot Find data in a moment (HBase is too difficalt to operate)</li>
+				</ul>
+			</section>
+			
+			<section class="slide">
+				<h1>mongo-hadoop</h1>
+			</section>
+			
+			<section class="slide">
+				<h2><a href="https://github.com/mongodb/mongo-hadoop">mongo-hadoop</a></h2>
+				<h3>What?</h3>
+				<p>mongo-hadoop is Adapter. It enables Hadoop to access MongoDB data.</p>
+				<p>mongo-hadoop supports shards and chunks enviromnent ... ?</p>
+			</section>
 
-		<div class="mod-page plain">
-			<div>
-				<h2>&gt; db.pages.find({"cls.mthd": "Config::Config"})</h2>
-				<pre class="brush: cpp">mapper.reset( new JSMapper( cmdObj["map"] ) );
-reducer.reset( new JSReducer( cmdObj["reduce"] ) );
-if ( cmdObj["finalize"].type() && cmdObj["finalize"].trueValue() )
-  finalizer.reset( new JSFinalizer( cmdObj["finalize"] ) );</pre>
-				<p>
-					map/reduceクラスの生成や、outのオプションの処理、query生成、sort、limitとかを行う。
-				</p>
-				<p>
-					あんまり面白くない
-				</p>
-			</div>
-		</div>
+			<section class="slide">
+				<h1>mongo-hadoop...<br>
+					not supported multiple-sharding key</h1>
+			</section>
+			
+			<section class="slide">
+				<h1>Pull Request...</h1>
+				<img src="./images/pullrequest.png"/>
+			</section>
+			
+			<section class="slide">
+				<h1>Merged!<br>mongo-hadoop supported <br> shards and chunks enviromnent.</h1>
+				<img src="./images/pullrequestRes.png"/>
+			</section>
+			
+			<section class="slide">
+				<h2>Sample</h2>
+				<h3>Driver</h3>
+				<pre class="sh_java">MongoConfigUtil.setInputURI( conf, "mongodb://localhost/test.in" ); // set input host, db, collection
+MongoConfigUtil.setOutputURI( conf, "mongodb://localhost/test.out" ); // set output host, db, collection</pre>
+				<h3>Mapper</h3>
+				<pre class="sh_java">public void map( Object key, BSONObject value, Context context ) throws IOException, InterruptedException{
+  // get pair consisted of Object key and BSONObject value in MongoDB document</pre>
+			</section>
+			
+			<section class="slide">
+				<h2>we gotta in mongo-hadoop</h2>
+				<h3><s>MongoDB</s> Hadoop</h3>
+				<ul>
+					<li><s>not</s> Easy Calculate Large Data</li>
+				</ul>
+				<h3><s>Hadoop</s> MongoDB</h3>
+				<ul>
+					<li><s>Too much</s> Limited Daemons</li>
+					<li><s>Often not "Healthy" warning</s></li>
+					<li><s>Cannot</s> Can Find data in a moment <s>(HBase is too difficalt to operate)</s></li>
+				</ul>
+			</section>
+			
+			<section class="slide">
+				<h2>Pros./Cons. in Mongo-Hadoop Architecture</h2>
+				<h3>Pros.</h3>
+				<ul>
+					<li>MongoDB excludes SPOF and eliminates Tortures by daemon management</li>
+					<li>MongoDB enables us to get data in specific query</li>
+					<li>Hadoop calculates Large Data</li>
+					<li>Hadoop is rather "Large Data calculator" than "Large Data Storage"</li>
+					<li>Calculated Data is restricted by MongoDB Query rather than Filter in Mapper Class</li>
+				</ul>
+				<h3>Cons.</h3>
+				<ul>
+					<li>Require Rich Disk and Memory</li>
+					<li>Require Low Performance (a little)</li>
+				</ul>
+			</section>
+			
+			<section class="slide">
+				<h2>Tips</h2>
+				<h3>Calculated Data filtered before Hadoop Map/Reduce</h3>
+				<ul>
+					<li>mongod can find big data as quickly because mongo-hadoop uses config information and asks data in chunk (so mapper asks single mongod)</li>
+					<li>However, BSON decorder is too slow. It blocks transporting data from mongod to mongoclient (mongo shell or other driver)</li>
+					<li>So you specify "fields" and get necessary data</li>
+					<li>e.g. mapper tasks took 3 min. but when we specify "field", mapper tasks took 1.5 min.</li>
+				</ul>
+				<h3>Reducer Class is also used Combiner Class</h3>
+				<ul>
+					<li>make reducer class extends <br>Reducer&lt;BSONObject, BSONWritable, BSONObject, BSONWritable&gt; </li>
+					<li>we use it also as a combiner class.</li>
+				</ul>
+			</section>
 
-		<div class="mod-page plain">
-			<div>
-				<h2>&gt; db.pages.find({"cls.mthd": "JSFunction::JSFunction"})</h2>
-				<pre class="brush: cpp">JSFunction::JSFunction( string type , const BSONElement& e ) {
-  _type = type;
-  _code = e._asCode();
-  if ( e.type() == CodeWScope ){
-    _wantedScope = e.codeWScopeObject();
-  }
-}</pre>
-				<p>
-					関数定義を文字列で受け取ってクラス変数に格納
-				</p>
-			</div>
-		</div>
-
-		<div class="mod-page plain">
-			<div>
-				<h2>&gt; db.pages.find({"cls.mthd": "JSFunction::init"})</h2>
-				<pre class="brush: cpp">void JSFunction::init( State * state ) {
-  _scope = state->scope();
-  assert( _scope );
-  _scope->init( &_wantedScope );
-
-  _func = _scope->createFunction( _code.c_str() );
-  uassert( 13598 , str::stream() << "couldn't compile code for: " << _type , _func );
-
-  // install in JS scope so that it can be called in JS mode
-  _scope->setFunction(_type.c_str(), _code.c_str());
-}</pre>
-				<p>
-					スコープを初期化し、関数実体を生成
-					createFunction自体はengine(spidermonkey || v8 || java などに丸投げ)
-				</p>
-			</div>
-		</div>
-
-		<div class="mod-page plain">
-			<div>
-				<h2>&gt; db.pages.find({"cls": "State"})</h2>
-				<pre class="brush: cpp">State::State( const Config& c )					
-State::~State()
-void State::init()
-					
-void State::prepTempCollection()
-long long State::postProcessCollection()
-					
-void State::appendResults( BSONObjBuilder& final )	
-long long State::postProcessCollectionNonAtomic()
-void State::insert( const string& ns , const BSONObj& o )
-void State::insertToInc( BSONObj& o )
-void State::_insertToInc( BSONObj& o )
-bool State::sourceExists()
-long long State::incomingDocuments()
-void State::switchMode(bool jsMode)
-void State::bailFromJS()
-void State::finalReduce( BSONList& values )
-void State::finalReduce( CurOp * op , ProgressMeterHolder& pm )
-void State::reduceInMemory()
-void State::dumpToInc()
-void State::emit( const BSONObj& a )
-void State::_add( InMemory* im, const BSONObj& a , long& size )
-void State::checkSize()</pre>
-				<p>
-					なんか、機能詰め込みすぎてイミフになってるクラス (全部は追っていません)
-				</p>
-			</div>
-		</div>
+			<section class="slide">
+				<h2>宣伝</h2>
+				<iframe style="width: 100%;height:100%;" src="http://cloud.nifty.com/feature/"></iframe>
+			</section>
+			<section class="slide">
+				<h1>「ユーザの生活を楽しくする」<br>「より楽しくお金を払ってもらえる」<br>「ビジネスを加速させる」<br>DataMiner/DataScientist<br>を募集しています。<br>つ @muddydixon</h2>
+			</section>
+			<a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
+			<a href="#" class="deck-next-link" title="Next">&#8594;</a>
+			<p class="deck-status">
+				<span class="deck-status-current"></span>/<span class="deck-status-total"></span>
+			</p>
+		</article>
+ 		<footer>
+ 			(c) muddydixon [at] gmail.com
+ 		</footer>
 		
-		<div class="mod-page plain">
-			<div>
-				<h2>&gt; db.pages.find({"cls.mthd": "State::State"})</h2>
-				<p>
-					Stateオブジェクトにいろんな情報があったり、emitがあったりするので、面白いですが、ここでは格別面白くないです。
-				</p>
-				<p>
-					一点面白いのは、下記の部分で、_onDiskというフラグを持っているところです。これは、あとあといろんな所で出てきます。(だから、なになのかは未追跡)
-				</p>
-				<pre class="brush: cpp">_onDisk = _config.outType != Config::INMEMORY;</pre>
-
-			</div>
-		</div>
-
-		<div class="mod-page plain">
-			<div>
-				<h2>&gt; db.pages.find({"cls.mthd": "State::init"})</h2>
-				<pre class="brush: cpp">_scope.reset(globalScriptEngine->getPooledScope( _config.dbname ).release() );
-_scope->localConnect( _config.dbname.c_str() );
-_config.mapper->init( this ); // <= mapper初期化
-_config.reducer->init( this ); // <= reducer初期化
-if ( _config.finalizer ) // <= finalizerがあれば
-  _config.finalizer->init( this ); // <= finerlizer初期化
-_scope->setBoolean("_doFinal", _config.finalizer);</pre>
-				<p>
-				</p>
-				<pre class="brush: cpp">// by default start in JS mode, will be faster for small jobs
-_jsMode = _config.jsMode; // <= v2.0からのjsModeのフラグチェックとかもあります</pre>
-			</div>
-		</div>
-
-		<div class="mod-page plain">
-			<div>
-				<h2>&gt; db.pages.find({title: "フロー概略"}).skip(1).limit(1)</h2>
-				<pre class="brush: bash">Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::incomingDocuments
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr8JSMapperE::map // <= map関数起動
-Mon Oct 17 01:55:10 [conn1] fast_emit // <= mapperの中のemitはfast_emitに置換されている (injectNative)
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::emit // <= fast_emit内でState::emitをcall
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::_add // <= State::emit内で_addをcall
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr8JSMapperE::map // <= 以下繰り返し
-Mon Oct 17 01:55:10 [conn1] fast_emit
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::emit
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::_add
-
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::reduceInMemory // <= reduce処理開始
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr9JSReducerE::reduce
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr9JSReducerE::_reduce
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::_add
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::dumpToInc // <= memory(out: inline)の場合以外は、DISCに書きこむ
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::_insertToInc
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::finalReduce // <= うっかりtupleが複数ある場合の予防線？ + finalizer
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::finalReduce
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr9JSReducerE::finalReduce
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::insert</pre>
-			</div>
-		</div>
+    <script type="text/javascript" src="./js/jquery-1.7.min.js"></script>
+    <script type="text/javascript" src="./deck.js/core/deck.core.js"></script>
+    <script type="text/javascript" src="./deck.js/extensions/goto/deck.goto.js"></script>
+    <script type="text/javascript" src="./deck.js/extensions/hash/deck.hash.js"></script>
+    <script type="text/javascript" src="./deck.js/extensions/navigation/deck.navigation.js"></script>
+    <script type="text/javascript" src="./deck.js/extensions/menu/deck.menu.js"></script>
 		
-		<div class="mod-page plain">
-			<div>
-				<h2>&gt; db.pages.find({"cls.mthd": "JSMapper::map"})</h2>
-				<span>JSMapper::map</span>
-				<pre class="brush: cpp">if ( s->invoke( _func.func() , &_params, &o , 0 , true, false, true ) )</pre>
-				<span>fast_emit (emitがinjectNativeでfast_emitになっている)</span>
-				<pre class="brush: cpp">state->emit( b.obj() );</pre>
-				<span>State::emit</span>
-				<pre class="brush: cpp">_add( _temp.get() , a , _size );</pre>
-				<span>State::_add</span>
-				<pre class="brush: cpp">BSONList& all = (*im)[a];
-all.push_back( a );</pre>
-				<p>
-					面白かったのは、mongodbのmapReduceで渡したmap関数のemitがinjectNativeでfast_emitされているところ。つまり、ここをいじればemitを思いのままにできたり、その他のメソッドを注入できたりする！
-				</p>
-			</div>
-		</div>
-
-		<div class="mod-page plain">
-			<div>
-				<h2>&gt; db.pages.find({"cls.mthd": "State::reduceInMemory"})</h2>
-				<span>JSMapper::map</span>
-				<pre class="brush: cpp">for ( InMemory::iterator i=_temp->begin(); i!=_temp->end(); ++i ) {
-    BSONObj key = i->first;
-    BSONList& all = i->second;
-
-    if ( all.size() == 1 ) {
-        // only 1 value for this key
-        if ( _onDisk ) {
-            // this key has low cardinality, so just write to collection
-            writelock l(_config.incLong);
-            Client::Context ctx(_config.incLong.c_str());
-            _insertToInc( *(all.begin()) );
-        }
-        else {
-            // add to new map
-            _add( n.get() , all[0] , nSize );
-        }
-    }
-    else if ( all.size() > 1 ) {
-        // several values, reduce and add to map
-        BSONObj res = _config.reducer->reduce( all );
-        _add( n.get() , res , nSize );
-    }
-}</pre>
-				<p>
-					噂のIterator処理です。一応、iteratorの残サイズをチェックしたりしているのがわかります。size != 1の時にReducerが走っています。言い換えると、すべてがユニークな場合は、reducerは呼ばれない！？
-				</p>
-			</div>
-		</div>
-
-		<div class="mod-page plain">
-			<div>
-				<h2>&gt; db.pages.find({"cls.mthd": "State::finalReduce"})</h2>
-				<span>JSMapper::map</span>
-				<pre class="brush: cpp">if (tuples.size() == 1) {
-    // 1 obj, just use it
-    key = tuples[0];
-    BSONObjBuilder b(key.objsize());
-    BSONObjIterator it(key);
-    b.appendAs( it.next() , "_id" );
-    b.appendAs( it.next() , "value" );
-    res = b.obj();
-}
-else {
-    // need to reduce
-    int endSizeEstimate = 16;
-    _reduce( tuples , key , endSizeEstimate );
-    BSONObjBuilder b(endSizeEstimate);
-    b.appendAs( key.firstElement() , "_id" );
-    _func.scope()->append( b , "value" , "return" );
-    res = b.obj();
-}
-
-if ( finalizer ) {
-    res = finalizer->finalize( res );
-}</pre>
-				<p>
-					(k, v)が複数存在した場合(shardの時かな？)にmergeする + finalizerがここで発動
-				</p>
-			</div>
-		</div>
-
-		<div class="mod-page plain">
-			<div>
-				<h2>&gt; db.pages.find({title: "フロー概略"}).skip(2).limit(1)</h2>
-				<pre class="brush: bash">Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::postProcessCollection // <= collectionの後処理
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::postProcessCollectionNonAtomic
-Mon Oct 17 01:55:10 [conn1] CMD: drop test.out
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::appendResults // <= 結果(かかった時間とか、map数とか)をオブジェクトに突っ込む
-Mon Oct 17 01:55:10 [conn1] PN5mongo2mr5StateE::~State // <= distructor
-Mon Oct 17 01:55:10 [conn1] CMD: drop test.tmp.mr.in_0
-Mon Oct 17 01:55:10 [conn1] CMD: drop test.tmp.mr.in_0_inc
-Mon Oct 17 01:55:10 [conn1] command test.$cmd command: { mapreduce: "in", map: function () {
-    emit(1, 1);
-}, reduce: function (k, vs) {
-    return vs.length;
-}, out: "out" } ntoreturn:1 reslen:127 125ms
-Mon Oct 17 01:55:10 [conn1] end connection 127.0.0.1:65122 (0 connections now open)</pre>
-			</div>
-		</div>
-		
-		<hr />
-		<ul class="mod-pager" id="pager"> <li id="pager-L"><a href="#">L</a></li> <li id="pager-R"><a href="#">R</a></li> </ul>
-		<p class="mod-pageNum" id="pageNum"> <span class="current" id="pageNum-current">0</span> / <span class="total" id="pageNum-total">0</span> </p>
-		
-    <script type="text/javascript" src="./js/jquery-1.5.2.min.js"></script>
-    <script type="text/javascript" src="./js/jquery.presentation.js"></script>
-		<script type="text/javascript">
-			SyntaxHighlighter.all();
-		</script>
+    <script type="text/javascript" src="./shjs/sh_main.min.js"></script>
+    <script type="text/javascript" src="./shjs/lang/sh_javascript_dom.min.js"></script>
+    <script type="text/javascript" src="./shjs/lang/sh_html.min.js"></script>
+    <script type="text/javascript" src="./shjs/lang/sh_sh.min.js"></script>
+    <script type="text/javascript" src="./shjs/lang/sh_java.min.js"></script>
+    <script type="text/javascript" src="./shjs/lang/sh_css.min.js"></script>
+    <script type="text/javascript" src="./js/main.js"></script>
 	</body>
 </html>
