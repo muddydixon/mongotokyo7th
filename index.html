@@ -110,7 +110,7 @@
 			</section>
 			
 			<section class="slide">
-				<h1>そんな解析担当者に贈りたい</h1>
+				<h1>そんな<br><span style="font-size: 16pt">"muddydixon"を含む</span><br>孤独で忙しく賢くない<br>解析担当者に贈りたい</h1>
 			</section>
 			
 			<section class="slide">
@@ -200,6 +200,7 @@
 				<h3>What?</h3>
 				<p>mongo-hadoop is Adapter. It enables Hadoop to access MongoDB data.</p>
 				<p>mongo-hadoop supports shards and chunks enviromnent ... ?</p>
+				<img src="./images/mongo-hadoop.png">
 			</section>
 
 			<section class="slide">
@@ -248,24 +249,36 @@ MongoConfigUtil.setOutputURI( conf, "mongodb://localhost/test.out" ); // set out
 					<li>MongoDB excludes SPOF and eliminates Tortures by daemon management</li>
 					<li>MongoDB enables us to get data in specific query</li>
 					<li>Hadoop calculates Large Data</li>
-					<li>Hadoop is rather "Large Data calculator" than "Large Data Storage"</li>
-					<li>Calculated Data is restricted by MongoDB Query rather than Filter in Mapper Class</li>
+					<li>Hadoop is rather "Large Data calculator" than "Large Data Storage". Monitering does not bother us.</li>
+					<li>Calculated Data is restricted by Filter in Mapper Class rather than by MongoDB Query </li>
 				</ul>
 				<h3>Cons.</h3>
 				<ul>
 					<li>Require Rich Disk and Memory</li>
-					<li>Require Low Performance (a little)</li>
+					<li>In comparison to Hadoop HDFS, mongo-hadoop Map/Reduce is Low Performance. </li>
 				</ul>
 			</section>
 			
 			<section class="slide">
 				<h2>Tips</h2>
-				<h3>Calculated Data filtered before Hadoop Map/Reduce</h3>
+				<h3>in mongo-hadoop, Calculated Data filtered before Hadoop Map/Reduce</h3>
 				<ul>
-					<li>mongod can find big data as quickly because mongo-hadoop uses config information and asks data in chunk (so mapper asks single mongod)</li>
-					<li>However, BSON decorder is too slow. It blocks transporting data from mongod to mongoclient (mongo shell or other driver)</li>
-					<li>So you specify "fields" and get necessary data</li>
-					<li>e.g. mapper tasks took 3 min. but when we specify "field", mapper tasks took 1.5 min.</li>
+					<li>The performance of mongo-hadoop's Map/Reduce is lower than Hadoop Map/Reduce.</li>
+					<li>In mongo-hadoop data is pre-filtered by MongoDB Query.</li>
+					<li>Thus, Hadoop Mapper Jobs do processes for less number of record (document).</li>
+				</ul>
+				<h3>BSON Decoder in mongo-java-driver</h3>
+				<ul>
+					<li>mongo-hadoop pays cost for BSON Decoding.</li>
+					<li>It is not small to calculate billion documents.</li>
+				</ul>
+			</section>
+			<section class="slide">
+				<h2>Tips</h2>
+				<h3>Restricted Field improves Performance</h3>
+				<ul>
+					<li>Above reason, the smaller size of BSON document is, the faster BSONDecoder decode the BSON document</li>
+					<li>To restrict field of document is good to improve performance.</li>
 				</ul>
 				<h3>Reducer Class is also used Combiner Class</h3>
 				<ul>
