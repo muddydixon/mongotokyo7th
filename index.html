@@ -143,7 +143,7 @@
 				<h3>Cons</h3>
 				<ul>
 					<li>OOM in Map/Reduce</li>
-					<li>Rich Resources required (memory / disc)</li>
+					<li>Rich Resources (memory / disc)</li>
 				</ul>
 				<h3>Pros</h3>
 				<ul>
@@ -160,13 +160,13 @@
 				<ul>
 					<li>Difficulty in Operation</li>
 					<li>Many Daemons</li>
-					<li>HBase requires more Daemons</li>
+					<li>HBase needs more Daemons</li>
 					<li>hive spends much time</li>
 				</ul>
 				<h3>Pros</h3>
 				<ul>
 					<li>Scaleout</li>
-					<li>Map/Reduce enables us to Calculate Large Data</li>
+					<li>Calculate Large Data by Map/Reduce</li>
 					<li>Scalable FileSystem (HDFS) supported</li>
 				</ul>
 			</section>
@@ -175,9 +175,9 @@
 				<h2>We want</h2>
 				<ul>
 					<li>Calculate Large Data Easily (No OOM Killer)</li>
-					<li>No more management Daemons</li>
-					<li>No more non-"Healthy"</li>
-					<li>Find data in a moment on specific query (we use REST API)</li>
+					<li>No more Daemons</li>
+					<li>No more non-"Healthy" State</li>
+					<li>Find data in a moment (we use REST API)</li>
 				</ul>
 			</section>
 			
@@ -250,15 +250,15 @@ MongoConfigUtil.setOutputURI( conf, "mongodb://localhost/test.out" ); // set out
 				<h2>Pros./Cons. in Mongo-Hadoop Architecture</h2>
 				<h3>Pros.</h3>
 				<ul>
-					<li>MongoDB excludes SPOF and eliminates Tortures by daemon management</li>
-					<li>MongoDB enables us to get data in specific query</li>
-					<li>Hadoop calculates Large Data</li>
+					<li>No SPOF by MongoDB. No Tortures of daemon management</li>
+					<li>Find data in a moment by MongoDB Query</li>
+					<li>Calculate Large Data by Hadoop Map/Reduce</li>
 					<li>Hadoop is rather "Large Data calculator" than "Large Data Storage". Monitering does not bother us.</li>
-					<li>Calculated Data is restricted by Filter in Mapper Class rather than by MongoDB Query </li>
+					<li>Calculated Data is pre-filtered by MongoDB Query brefore Hadoop Map/Reduce.</li>
 				</ul>
 				<h3>Cons.</h3>
 				<ul>
-					<li>Require Rich Disk and Memory</li>
+					<li>Rich Disk and Memory</li>
 					<li>In comparison to Hadoop HDFS, mongo-hadoop Map/Reduce is Low Performance. </li>
 				</ul>
 			</section>
@@ -296,7 +296,7 @@ MongoConfigUtil.setOutputURI( conf, "mongodb://localhost/test.out" ); // set out
 				<ul>
 					<li>No More Daemons</li>
 					<li>Hadoop is only Large Data Computer</li>
-					<li>We gatta both REST API and Large Data Mining System</li>
+					<li>We gotta both REST API and Large Data Mining System</li>
 				</ul>
 			</section>
 			
